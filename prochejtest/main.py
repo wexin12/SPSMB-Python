@@ -63,7 +63,7 @@ def faktorial_ez():
 def combination_num():
     number = int(input("Zadej cislo: "))
     k = int(input("Zadej cislo: "))
-    print(faktorial_ez(N) / ( faktorial_ez(k) * ( faktorial_ez(number - k))))
+    print(faktorial_ez(number) / ( faktorial_ez(k) * ( faktorial_ez(number - k))))
 # 4 . 2
 def factorial_rekurze(number):
     if number <= 0:
