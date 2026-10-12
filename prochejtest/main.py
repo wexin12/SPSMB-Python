@@ -99,6 +99,7 @@ def pythagoras():
     number2 = int(input("Zadej odvesnu 2:"))
     c =((number ** 2) + (number2 ** 2)) ** 0.5
     print(c)
+# 
 
 
 if __name__ == "__main__":
