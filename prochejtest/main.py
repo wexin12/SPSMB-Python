@@ -99,8 +99,25 @@ def pythagoras():
     number2 = int(input("Zadej odvesnu 2:"))
     c =((number ** 2) + (number2 ** 2)) ** 0.5
     print(c)
-# 
+# 7 . 3
+def prumer():
+    N = int(input("Zadej pocet prvku: "))
+    numbers = []
+    for i in range(N):
+        number = int(input(f"Zadej {i + 1} cislo: "))
+        numbers.append(number)
+    print(sum(numbers) / len(numbers))    
+# 7 . 5
+def zjistipocetcifer():
+    N = int(input("Zadej cislo: "))
+    list = []
+    while N != 0:
+        list.append(N % 10)
+        N = N // 10
+    print(len(list))   # 7 .6 print(sum(list)) 7.7 print(list)
+#                                                                                                                  
+
 
 
 if __name__ == "__main__":
-    pythagoras()
+    zjistipocetcifer()

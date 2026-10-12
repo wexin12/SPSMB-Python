@@ -1,4 +1,4 @@
-def test_fun()
+def test_fun():
     i = 6
     j = 7
     return i, j
