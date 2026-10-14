@@ -115,9 +115,18 @@ def zjistipocetcifer():
         list.append(N % 10)
         N = N // 10
     print(len(list))   # 7 .6 print(sum(list)) 7.7 print(list)
-#                                                                                                                  
+#9.1
+def NSD():
+    a = int(input("Zadej cislo a: "))
+    b = int(input("Zadej cislo b: "))
+    r = 1
+    while r != 0:
+        r = (a % b)
+        a = b
+        b = r
+    print(f"Nejmensi spolecny delitel je {a}")                                                                                                                      
 
 
 
 if __name__ == "__main__":
-    zjistipocetcifer()
+    NSD()
