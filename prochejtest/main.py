@@ -124,9 +124,75 @@ def NSD():
         r = (a % b)
         a = b
         b = r
-    print(f"Nejmensi spolecny delitel je {a}")                                                                                                                      
-
-
+    print(f"Nejmensi spolecny delitel je {a}")
+# 11. 1
+def findout():
+    text = input("Zadej text: ")
+    print(len(text))
+# 11 . 3
+def palindrom():
+    text = input("Zadej text: ")
+    pal = text[::-1]
+    if pal == text:
+        print("Zadane slovo je palindrom")
+    else:
+        print("Zadane slovo neni palidrom1")
+# 11 . 4
+def samo():
+    pocet = 0
+    text = input("Zadej text: ")
+    list = ["a", "e", "i", "o", "u", "y"]
+    for i in range(len(text)):
+        for j in range(len(list)):
+            if text[i] == list[j]:
+                pocet = pocet + 1
+    return pocet            
+def znaky():
+    counter = 0
+    text = input("Zadek text: ")
+    dct = {}
+    for i in text:
+        if i in dct.keys():
+            counter = dct[i]
+        else:
+            dct[i] = 1
+    print(dct) 
+# 12 . 1
+def soucet_list():
+    N = input("Zadej cisla: ")
+    number =[] 
+    for i in N.split():
+        number.append(int(i))
+    print(sum(number))
+# 12 . 3
+def seznam():
+    N = input("Zadej cisla: ")
+    number = []
+    for i in N.split():
+        number.append(int(i))
+    print(number[::-1])                        
+# 12.4
+def dupe():
+    N = input("Zadejte cisla: ")
+    cislo = []
+    for i in N.split():
+        a = int(i)
+        if a not in cislo:
+            cislo.append(a)
+    print(cislo)        
+# 12 . 2
+def maxmin():
+    N = input("Zadejte cisla: ")
+    numbers = []
+    min = float("inf")
+    max = float("-inf")
+    for i in N.split():
+        a = int(i)
+        if a > max:
+            max = a
+        if a < min:
+            min = a    
+    print(f"max {max} min {min}")        
 
 if __name__ == "__main__":
-    NSD()
+    maxmin()
