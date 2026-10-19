@@ -193,6 +193,41 @@ def maxmin():
         if a < min:
             min = a    
     print(f"max {max} min {min}")        
+# 13.1 
+def hledani():
+    x = int(input("Zadej pocet prvku: "))
+    list = []
+    for i in range(x):
+        i = int(input("Zadej prvek: "))
+        list.append(i)
+    hledana = int(input("Zadej hledanou: "))
+    for index, num in enumerate(list):
+        if num == hledana:
+            print(f"Cislo se nachazi na {index} indexu") 
+            return
+    print("Cislo se tam nenachazi")    
+# 13.2
+def binary():
+    search = 2
+    lst = [1,2,3,4,5]
+    lst.sort()
+    left = 0 
+    right = len(lst) - 1
+    middle = (left + right) // 2
+    while right - left != 1:
+        middle = (left + right) // 2
+        if lst[middle] == search:
+            print("Nalezeno")
+            return
+        if lst[middle] > search:
+            right = middle
+        if lst[middle] < search:
+            left = middle
+
+        if lst[0] == search or lst[-1] == search:
+            print("Nalezeno")
+            return  
+    print("Nenalezeno")              
 
 if __name__ == "__main__":
-    maxmin()
+    binary()
