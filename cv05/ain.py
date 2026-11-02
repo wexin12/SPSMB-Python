@@ -1,4 +1,4 @@
-from matrix import plus
+from matrix import plus, format, transform
 
 if __name__ == "__main__":
     matrix_a = [
@@ -13,4 +13,4 @@ if __name__ == "__main__":
     ]
 
 matrix_c = plus(matrix_a, matrix_b)
-print(matrix_c)
+print(transform(matrix_a))
