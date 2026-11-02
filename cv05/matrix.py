@@ -50,4 +50,36 @@ def transform(matrix):
     for i in range(m):
         for j in range(n):
             result[j][i] = matrix[i][j]
-    return result                  
+    return result    
+
+def apply(matrix, func):
+    m, n = size_of(matrix)
+    result = zeros(m, n)
+    for i in range(m):
+        for j in range(n):
+            result[i][j] = func(matrix[i][j])
+    return result        
+
+        
+def multiply_constant(matrix, const):
+    m, n = size_of(matrix)
+    result = zeros(m, n)
+    for i in range(m):
+        for j in range(n):
+            result[i][j] = matrix[i][j] * const
+    return result   
+
+
+def multiply(matrix_a, matrix_b):
+    mA, nA = size_of(matrix_a)
+    mB, nB = size_of(matrix_b)
+    if nA != nB:
+        print("Nejde to!")
+    result = zeros(mA, nB)
+    for i in range(mA):
+        for j in range(nB):
+            suma = 0
+            for l in range(nA):
+                suma += matrix_a[i][l] * matrix_b[l][j]
+            result[i][j] = suma
+    return result         
