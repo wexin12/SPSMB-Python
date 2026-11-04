@@ -1,23 +1,29 @@
-from matrix import plus, format, transform, multiply_constant, multiply, replace_row, determinant, vypocetobashu
+from matrix import plus, format, transform, multiply_constant, multiply, replace_row, determinant, vypocetobashu,convolution
+from view import load, numpy_to_list, list_to_numpy, show
 
 if __name__ == "__main__":
-    matrix_a = [
-        [1, 0, 1],
-        [0, 1, 0],
-        [0, 0, 1]
+    kernel = [
+        [-1, 0, 1],
+        [-2, 0, 2],
+        [-1, 0, 1]
     ]
-    matrix_b = [
+    kernel1 = [
+        [0, -1, 0],
+        [-1, 5, -1],
+        [0, -1, 0]
+    ]
+    kernel2 = [
         [1, 1, 1],
         [1, 1, 1],
         [1, 1, 1]
     ]
-    matrix_orignal = [
-        [5, 0],
-        [2, 2]
-    ]
-    matrix_replace = [
-        [1, 1, 1]
-    ]
+    
 
-matrix_c = plus(matrix_a, matrix_b)
-print(vypocetobashu(matrix_orignal)) 
+    image = load("C:\\Users\\martin.klima\\Desktop\\SPSMB-Python\\cv05\\taliayang.png")
+ 
+    img = numpy_to_list(image)
+    new_img = convolution(img, kernel)
+    new_img2 = convolution(img, kernel1)
+    np_img = list_to_numpy(plus(new_img, new_img2))
+    show(np_img)
+

@@ -100,7 +100,25 @@ def determinant(matrix):
 def vypocetobashu(matrix):
         return determinant(matrix)
 
-    
+def _get_value(matrix, x, y):
+    m, n = size_of(matrix)
+    if x >= 0 and x < m and y >= 0 and y < n:
+        return matrix[x][y] 
+    else:
+        return 0
+
+def _do_convolution(matrix, x, y, kernel):
+    return (_get_value(matrix, x - 1, y - 1) * kernel[0][0] + _get_value(matrix, x - 1, y) * kernel[0][1] + _get_value(matrix, x - 1, y + 1) * kernel[0][2]
+         + _get_value(matrix, x, y - 1) * kernel[1][0] + _get_value(matrix, x, y) * kernel[1][1] + _get_value(matrix, x, y + 1) * kernel[1][2]
+         + _get_value(matrix, x + 1, y - 1) * kernel[2][0] + _get_value(matrix, x + 1, y) * kernel[2][1] + _get_value(matrix, x + 1, y + 1) * kernel[2][2])
+
+def convolution(matrix, kernel):
+    m, n = size_of(matrix)
+    result = zeros(m, n)
+    for i in range(m):
+        for j in range(n):
+            result[i][j] = _do_convolution(matrix, i, j, kernel)
+    return result
     
 
 
