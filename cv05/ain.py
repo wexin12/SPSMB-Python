@@ -1,4 +1,4 @@
-from matrix import plus, format, transform, multiply_constant, multiply
+from matrix import plus, format, transform, multiply_constant, multiply, replace_row, determinant, vypocetobashu
 
 if __name__ == "__main__":
     matrix_a = [
@@ -11,6 +11,13 @@ if __name__ == "__main__":
         [1, 1, 1],
         [1, 1, 1]
     ]
+    matrix_orignal = [
+        [5, 0],
+        [2, 2]
+    ]
+    matrix_replace = [
+        [1, 1, 1]
+    ]
 
 matrix_c = plus(matrix_a, matrix_b)
-print(multiply(matrix_a, matrix_b)) 
+print(vypocetobashu(matrix_orignal)) 

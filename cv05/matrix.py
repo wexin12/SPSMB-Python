@@ -82,4 +82,25 @@ def multiply(matrix_a, matrix_b):
             for l in range(nA):
                 suma += matrix_a[i][l] * matrix_b[l][j]
             result[i][j] = suma
-    return result         
+    return result    
+
+def replace_row(matrix, vector, index):
+    m, n = size_of(vector)
+    for i in range(n):
+        for j in range(m):
+            matrix[i][j] = vector[i][j]
+
+def determinant(matrix):
+    m, n = size_of(matrix)
+    if m == 2 and n == 2:
+        return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
+    else:
+        raise ValueError (f"Neni 2x2")
+
+def vypocetobashu(matrix):
+        return determinant(matrix)
+
+    
+    
+
+
