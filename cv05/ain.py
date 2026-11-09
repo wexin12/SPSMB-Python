@@ -1,4 +1,4 @@
-from matrix import plus, format, transform, multiply_constant, multiply, replace_row, determinant, vypocetobashu,convolution
+from matrix import plus, format, transform, multiply_constant, multiply, replace_row, determinant, vypocetobashu, convolution
 from view import load, numpy_to_list, list_to_numpy, show
 
 if __name__ == "__main__":
