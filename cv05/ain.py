@@ -25,7 +25,7 @@ if __name__ == "__main__":
     ]
     
 
-    image = load("C:\\Users\\martin.klima\\Desktop\\SPSMB-Python\\cv05\\taliayang.png")
+    image = load("C:\\Users\\martin.klima\\SPSMB-Python\\cv05\\taliayang.png")
  
     img = numpy_to_list(image)
     new_img = convolution(img, kernel)

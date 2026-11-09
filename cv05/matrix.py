@@ -116,13 +116,6 @@ def _do_convolution(matrix, x, y, kernel):
             sum += _get_value(matrix, x + i, y + j) * kernel[i + center_index][j + center_index]         
     return sum        
 
-
-
-
-#    return (_get_value(matrix, x - 1, y - 1) * kernel[0][0] + _get_value(matrix, x - 1, y) * kernel[0][1] + _get_value(matrix, x - 1, y + 1) * kernel[0][2]
-#         + _get_value(matrix, x, y - 1) * kernel[1][0] + _get_value(matrix, x, y) * kernel[1][1] + _get_value(matrix, x, y + 1) * kernel[1][2]
-#         + _get_value(matrix, x + 1, y - 1) * kernel[2][0] + _get_value(matrix, x + 1, y) * kernel[2][1] + _get_value(matrix, x + 1, y + 1) * kernel[2][2])
-
 def convolution(matrix, kernel):
     m, n = size_of(matrix)
     result = zeros(m, n)
