@@ -141,7 +141,7 @@ def load_training_data():
 
     training_data = []
 
-    paths = glob.glob("cv06/validation/*.png")
+    paths = glob.glob("training_center/*.png")
 
     for path in paths:
 
@@ -161,6 +161,26 @@ def save_model(W1, B1, W2, B2):
 
     print("Model byl uložen!")
 
+def predict_image(path):
+
+    # Načtení již natrénovaného modelu
+    W1, B1, W2, B2 = load_model()
+
+    # Načtení obrázku
+    X = load_image(path)
+
+    # Průchod neuronovou sítí
+    Z1, A1, Z2, A2 = forward(X, W1, B1, W2, B2)
+
+    # Hledání neuronu s nejvyšší hodnotou
+    results = [A2[i][0] for i in range(10)]
+
+    prediction = results.index(max(results))
+
+    print(f"Rozpoznané číslo: {prediction}")
+    print(f"Jistota sítě (aktivace): {max(results):.4f}")
+
+    return prediction
 
 def load_model():
 
@@ -171,33 +191,64 @@ def load_model():
 
     return W1, B1, W2, B2
 
+def evaluate_model():
+
+    # Načtení natrénovaného modelu
+    W1, B1, W2, B2 = load_model()
+
+    # Načtení všech validačních obrázků
+    paths = glob.glob("training_center/8_*.png")
+
+    correct = 0
+    incorrect = 0
+
+    print("\n--- TESTOVÁNÍ NEURONOVÉ SÍTĚ ---\n")
+
+    for path in paths:
+
+        # Zjištění správné číslice z názvu souboru
+        filename = path.replace("\\", "/").split("/")[-1]
+        actual_label = int(filename.split("_")[0])
+
+        # Načtení obrázku
+        X = load_image(path)
+
+        # Dopředný průchod neuronovou sítí
+        Z1, A1, Z2, A2 = forward(
+            X, W1, B1, W2, B2
+        )
+
+        # Výběr nejaktivnějšího výstupního neuronu
+        results = [A2[i][0] for i in range(10)]
+        prediction = results.index(max(results))
+
+        # Porovnání výsledku
+        if prediction == actual_label:
+            correct += 1
+        else:
+            incorrect += 1
+
+            print(
+                f"CHYBA: {filename} | "
+                f"Správně: {actual_label} | "
+                f"Rozpoznáno: {prediction}"
+            )
+
+    # Výpočet úspěšnosti
+    total = correct + incorrect
+
+    if total == 0:
+        print("Nebyly nalezeny žádné testovací obrázky!")
+        return
+
+    accuracy = (correct / total) * 100
+
+    print("\n--- VÝSLEDKY ---")
+    print(f"Počet testovacích obrázků: {total}")
+    print(f"Správně rozpoznáno: {correct}")
+    print(f"Špatně rozpoznáno: {incorrect}")
+    print(f"\nÚspěšnost neuronové sítě: {accuracy:.2f} %")
+
+
 if __name__ == "__main__":
-
-    INPUT_SIZE = 256 * 256
-    HIDDEN_SIZE = 128
-    OUTPUT_SIZE = 10
-
-    W1 = gen_random_matrix(HIDDEN_SIZE, INPUT_SIZE)
-    W2 = gen_random_matrix(OUTPUT_SIZE, HIDDEN_SIZE)
-
-    B1 = zeros(HIDDEN_SIZE, 1)
-    B2 = zeros(OUTPUT_SIZE, 1)
-
-    training_data = load_training_data()
-
-    print(f"Počet trénovacích obrázků: {len(training_data)}")
-    
-
-    W1, B1, W2, B2 = train(
-        training_data,
-        epochs=1,
-        learning_rate=0.0001,
-        W1=W1,
-        B1=B1,
-        W2=W2,
-        B2=B2
-    )
-    print(W1)
-    print(B1)
-    print(W2)
-    print(B2)
+        evaluate_model()
