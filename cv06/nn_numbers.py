@@ -21,16 +21,16 @@ INPUT_SIZE = IMG_SIZE * IMG_SIZE
 OUTPUT_SIZE = 10
 INVERT = True
 
-TIME_LIMIT_H = 6.5                 # celkový čas běhu v hodinách (rezerva do 7 h)
-START_LR = 0.002                   # počáteční learning rate
-MIN_LR = 0.0002
+TIME_LIMIT_H = 0.5                 # celkový čas běhu v hodinách (rezerva do 7 h)
+START_LR = 0.2                   # počáteční learning rate
+MIN_LR = 0.002
 PATIENCE = 3                       # po kolika epochách bez zlepšení se LR půlí
 DIVERGENCE_FACTOR = 1.5            # loss > 1.5x předchozí => rollback
 VALIDATION_SPLIT = 0.1
 
 MODEL_FILE = "model.pkl"
 BEST_FILE = "model_best.pkl"
-DATA_PATTERN = "training_center/*.png"
+DATA_PATTERN = "cislice/**/*.png"
 
 FIRST_RUN_HIDDEN = 64
 
@@ -184,7 +184,6 @@ def evaluate(model, data, show_errors=False):
 
 
 def train(model, train_data, val_data):
-    deadline = time.time() + TIME_LIMIT_H * 3600
 
     lr = model.get("lr", START_LR)
     best_acc = model.get("best_acc", 0.0)
@@ -194,81 +193,172 @@ def train(model, train_data, val_data):
 
     W1, B1, W2, B2 = model["W1"], model["B1"], model["W2"], model["B2"]
 
-    while time.time() < deadline:
-        total_epoch = model["epochs"] + 1
-        random.shuffle(train_data)
-        total_loss = 0.0
-        timed_out = False
+    print("\nTrénink běží až do ručního zastavení (Ctrl+C).")
 
-        bar = tqdm(train_data, desc=f"Epocha {total_epoch} (lr {lr:.5f})",
-                   unit="img")
+    try:
+        while True:
 
-        for n, (path, label) in enumerate(bar, start=1):
-            if time.time() >= deadline:
-                timed_out = True
-                break
+            total_epoch = model["epochs"] + 1
+            random.shuffle(train_data)
+            total_loss = 0.0
 
-            X = load_image(path)
-            Y = zeros(OUTPUT_SIZE, 1)
-            Y[label][0] = 1
+            bar = tqdm(
+                train_data,
+                desc=f"Epocha {total_epoch} (lr {lr:.5f})",
+                unit="img"
+            )
 
-            _, A1, _, A2 = forward(X, W1, B1, W2, B2)
+            for n, (path, label) in enumerate(bar, start=1):
 
-            current_loss = 0.0
-            for i in range(OUTPUT_SIZE):
-                current_loss += 0.5 * (A2[i][0] - Y[i][0]) ** 2
-            total_loss += current_loss
+                X = load_image(path)
 
-            bar.set_postfix(loss=f"{current_loss:.4f}",
-                            avg=f"{total_loss / n:.4f}")
+                Y = zeros(OUTPUT_SIZE, 1)
+                Y[label][0] = 1
 
-            W1, B1, W2, B2 = backward(X, Y, A1, A2, W1, B1, W2, B2, lr)
+                _, A1, _, A2 = forward(X, W1, B1, W2, B2)
 
-        # vypršel čas uprostřed epochy -> ulož a skonči
-        if timed_out:
-            model.update(W1=W1, B1=B1, W2=W2, B2=B2, lr=lr,
-                         best_acc=best_acc, best_loss=best_loss)
-            save_model(model)
-            print("Čas vypršel, model uložen.")
-            break
+                current_loss = 0.0
 
-        avg_loss = total_loss / len(train_data)
-        print(f"Epocha {total_epoch} | lr {lr:.5f} | "
-              f"Loss: {total_loss:.4f} | Průměrný loss: {avg_loss:.6f}")
+                for i in range(OUTPUT_SIZE):
+                    current_loss += 0.5 * (A2[i][0] - Y[i][0]) ** 2
 
-        # --- ochrana proti divergenci: rollback na poslední dobrý model ---
-        if prev_loss is not None and avg_loss > prev_loss * DIVERGENCE_FACTOR:
-            lr = max(MIN_LR, lr * 0.5)
-            print(f"!! Loss vyskočil, rollback a nové lr = {lr:.5f}")
-            good = load_model(verbose=False)
-            W1, B1, W2, B2 = good["W1"], good["B1"], good["W2"], good["B2"]
-            model.update(W1=W1, B1=B1, W2=W2, B2=B2, lr=lr)
-            stale = 0
-            continue
+                total_loss += current_loss
 
-        prev_loss = avg_loss
+                bar.set_postfix(
+                    loss=f"{current_loss:.4f}",
+                    avg=f"{total_loss / n:.4f}"
+                )
 
-        # --- snižování lr při stagnaci ---
-        if avg_loss < best_loss * 0.998:
-            best_loss = avg_loss
-            stale = 0
-        else:
-            stale += 1
-            if stale >= PATIENCE and lr > MIN_LR:
+                W1, B1, W2, B2 = backward(
+                    X, Y, A1, A2,
+                    W1, B1, W2, B2,
+                    lr
+                )
+
+            # ---------------------------------------------------
+            # KONEC EPOCHY
+            # ---------------------------------------------------
+
+            avg_loss = total_loss / len(train_data)
+
+            print(
+                f"\nEpocha {total_epoch} | lr {lr:.5f} | "
+                f"Loss: {total_loss:.4f} | "
+                f"Průměrný loss: {avg_loss:.6f}"
+            )
+
+            # ---------------------------------------------------
+            # OCHRANA PROTI DIVERGENCI
+            # ---------------------------------------------------
+
+            if prev_loss is not None and avg_loss > prev_loss * DIVERGENCE_FACTOR:
+
                 lr = max(MIN_LR, lr * 0.5)
-                stale = 0
-                print(f"Stagnace, snižuji lr na {lr:.5f}")
 
-        model.update(W1=W1, B1=B1, W2=W2, B2=B2, epochs=total_epoch,
-                     lr=lr, best_acc=best_acc, best_loss=best_loss)
+                print(
+                    f"!! Loss vyskočil, rollback "
+                    f"a nové lr = {lr:.5f}"
+                )
+
+                good = load_model(verbose=False)
+
+                if good is not None:
+                    W1 = good["W1"]
+                    B1 = good["B1"]
+                    W2 = good["W2"]
+                    B2 = good["B2"]
+
+                model.update(
+                    W1=W1,
+                    B1=B1,
+                    W2=W2,
+                    B2=B2,
+                    lr=lr
+                )
+
+                save_model(model)
+
+                stale = 0
+                continue
+
+            prev_loss = avg_loss
+
+            # ---------------------------------------------------
+            # SNIŽOVÁNÍ LEARNING RATE PŘI STAGNACI
+            # ---------------------------------------------------
+
+            if avg_loss < best_loss * 0.998:
+
+                best_loss = avg_loss
+                stale = 0
+
+            else:
+
+                stale += 1
+
+                if stale >= PATIENCE and lr > MIN_LR:
+
+                    lr = max(MIN_LR, lr * 0.5)
+                    stale = 0
+
+                    print(
+                        f"Stagnace, snižuji lr na {lr:.5f}"
+                    )
+
+            # ---------------------------------------------------
+            # ULOŽENÍ MODELU PO CELÉ EPOCHĚ
+            # ---------------------------------------------------
+
+            model.update(
+                W1=W1,
+                B1=B1,
+                W2=W2,
+                B2=B2,
+                epochs=total_epoch,
+                lr=lr,
+                best_acc=best_acc,
+                best_loss=best_loss
+            )
+
+            save_model(model)
+
+            print("Model uložen.")
+
+            # ---------------------------------------------------
+            # VALIDACE
+            # ---------------------------------------------------
+
+            acc = evaluate(model, val_data)
+
+            if acc >= best_acc:
+
+                best_acc = acc
+                model["best_acc"] = best_acc
+
+                save_model(model, BEST_FILE)
+
+                print(
+                    f"** Nový nejlepší model "
+                    f"({best_acc:.2f} %) uložen do {BEST_FILE}"
+                )
+
+    except KeyboardInterrupt:
+
+        print("\n\nTrénink ručně přerušen.")
+
+        model.update(
+            W1=W1,
+            B1=B1,
+            W2=W2,
+            B2=B2,
+            lr=lr,
+            best_acc=best_acc,
+            best_loss=best_loss
+        )
+
         save_model(model)
 
-        acc = evaluate(model, val_data)
-        if acc >= best_acc:
-            best_acc = acc
-            model["best_acc"] = best_acc
-            save_model(model, BEST_FILE)
-            print(f"** Nový nejlepší model ({best_acc:.2f} %) uložen do {BEST_FILE}")
+        print("Aktuální model byl uložen do model.pkl.")
 
     return model
 
@@ -290,5 +380,6 @@ if __name__ == "__main__":
     if os.path.exists(BEST_FILE):
         with open(BEST_FILE, "rb") as f:
             best = pickle.load(f)
+
         print("\n--- ZÁVĚREČNÝ TEST (nejlepší model) ---")
         evaluate(best, val_data, show_errors=True)
