@@ -1,3 +1,4 @@
+
 import math
 import os
 import pickle
@@ -59,7 +60,6 @@ def find_images(folder):
     if not folder.is_dir():
         raise SystemExit(f"'{folder}' není složka.")
 
-    # Projde všechny podsložky včetně jejich podsložek
     images = [
         path
         for path in folder.rglob("*")
@@ -86,13 +86,11 @@ def get_label(path):
 
     filename = Path(path).stem
 
-    # Číslice z názvu souboru (např. 7_obrazek.png)
     prefix = filename.split("_")[0]
 
     if prefix.isdigit() and 0 <= int(prefix) < OUTPUT_SIZE:
         return int(prefix)
 
-    # Číslice z názvu rodičovské složky (např. složka "7")
     parent = Path(path).parent.name
 
     if parent.isdigit() and 0 <= int(parent) < OUTPUT_SIZE:
@@ -178,6 +176,12 @@ if __name__ == "__main__":
     labeled = 0
     correct = 0
 
+    # Statistiky jednotlivých číslic
+    digit_stats = {
+        i: {"total": 0, "correct": 0}
+        for i in range(OUTPUT_SIZE)
+    }
+
     for path in images:
 
         digit, confidence = predict(model, path)
@@ -196,9 +200,15 @@ if __name__ == "__main__":
 
             labeled += 1
 
+            # Počet testovaných obrázků dané číslice
+            digit_stats[label]["total"] += 1
+
             if digit == label:
 
                 correct += 1
+
+                # Počet správně rozpoznaných obrázků
+                digit_stats[label]["correct"] += 1
 
                 print(
                     f"{path}: {digit} "
@@ -235,5 +245,33 @@ if __name__ == "__main__":
 
         print("Obrázky nemají označení správné číslice.")
         print("Úspěšnost proto nelze vypočítat.")
+
+    # -----------------------------------------------------------
+    # ÚSPĚŠNOST JEDNOTLIVÝCH ČÍSLIC
+    # -----------------------------------------------------------
+    print("\n" + "=" * 60)
+    print("ÚSPĚŠNOST JEDNOTLIVÝCH ČÍSLIC")
+    print("-" * 60)
+
+    for digit in range(OUTPUT_SIZE):
+
+        total = digit_stats[digit]["total"]
+        good = digit_stats[digit]["correct"]
+        bad = total - good
+
+        if total > 0:
+
+            accuracy = good / total * 100
+
+            print(
+                f"Číslice {digit}: "
+                f"{accuracy:6.2f} % "
+                f"({good}/{total} správně, "
+                f"{bad} špatně)"
+            )
+
+        else:
+
+            print(f"Číslice {digit}: žádné obrázky")
 
     print("=" * 60)

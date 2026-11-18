@@ -152,9 +152,30 @@ def load_model(verbose=True):
 
 def save_model(model, path=MODEL_FILE):
     tmp = path + ".tmp"
-    with open(tmp, "wb") as f:
-        pickle.dump(model, f)
-    os.replace(tmp, path)
+
+    try:
+        with open(tmp, "wb") as f:
+            pickle.dump(model, f)
+            f.flush()
+            os.fsync(f.fileno())
+
+        os.replace(tmp, path)
+
+        print(f"Model úspěšně uložen: {path}")
+
+    except PermissionError as e:
+        print(f"\nCHYBA: Nelze uložit model '{path}'.")
+        print("Soubor pravděpodobně používá jiný program.")
+        print("Zavři ostatní instance programu a zkus to znovu.")
+        print(f"Podrobnosti: {e}")
+
+        if os.path.exists(tmp):
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+
+        raise
 
 
 # ---------------------------------------------------------------

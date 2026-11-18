@@ -9,7 +9,7 @@ from PIL import Image
 SOURCE_DIR = Path("training_center")
 OUTPUT_DIR = Path("training_center_rotated")
 
-ROTATION_ANGLE = -3
+ROTATION_ANGLE = 10
 
 EXTENSIONS = (".png", ".jpg", ".jpeg")
 
