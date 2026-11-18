@@ -16,8 +16,7 @@ INPUT_SIZE = IMG_SIZE * IMG_SIZE
 OUTPUT_SIZE = 10
 INVERT = True
 
-# Hlavní složka obsahující 4 podsložky s obrázky
-DATA_DIR = "training_center"
+DATA_DIR = "cislice"
 
 EXTENSIONS = (".png", ".jpg", ".jpeg")
 MODEL_FILES = ["model_best.pkl", "model.pkl"]

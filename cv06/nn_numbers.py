@@ -22,15 +22,15 @@ OUTPUT_SIZE = 10
 INVERT = True
 
 TIME_LIMIT_H = 0.5                 # celkový čas běhu v hodinách (rezerva do 7 h)
-START_LR = 0.2                   # počáteční learning rate
-MIN_LR = 0.002
+START_LR = 0.02                   # počáteční learning rate
+MIN_LR = 0.0002
 PATIENCE = 3                       # po kolika epochách bez zlepšení se LR půlí
 DIVERGENCE_FACTOR = 1.5            # loss > 1.5x předchozí => rollback
 VALIDATION_SPLIT = 0.1
 
 MODEL_FILE = "model.pkl"
 BEST_FILE = "model_best.pkl"
-DATA_PATTERN = "cislice/**/*.png"
+DATA_PATTERN = "training_center/*.png"
 
 FIRST_RUN_HIDDEN = 64
 
