@@ -1,4 +1,3 @@
-
 import os
 import random
 from pathlib import Path
@@ -37,7 +36,7 @@ MODEL_PATH = "model_animals.pth"
 
 LEARNING_RATE = 0.001
 BATCH_SIZE = 8
-EPOCHS = 2
+EPOCHS = 10
 
 WEIGHT_DECAY = 0.0001
 EARLY_STOPPING_PATIENCE = 10
@@ -358,6 +357,7 @@ class AnimalDataset(Dataset):
 
         return X, Y
 
+
 # ==========================================
 # NAČTENÍ MODELU
 # ==========================================
@@ -649,26 +649,22 @@ def validate(
         class_total
     )
 
+
 # ==========================================
-# TRÉNOVÁNÍ
+# TRÉNOVÁNÍ (BEZ VALIDACE PO EPOCHÁCH)
 # ==========================================
 
 def train():
 
     all_data = load_all_data()
 
-    training_data, validation_data = split_dataset(
+    training_data, _ = split_dataset(
         all_data
     )
 
     training_dataset = AnimalDataset(
         training_data,
         transform=train_transform
-    )
-
-    validation_dataset = AnimalDataset(
-        validation_data,
-        transform=None
     )
 
     training_loader = DataLoader(
@@ -678,20 +674,6 @@ def train():
         batch_size=BATCH_SIZE,
 
         shuffle=True,
-
-        num_workers=0,
-
-        pin_memory=(DEVICE.type == "cuda")
-
-    )
-
-    validation_loader = DataLoader(
-
-        validation_dataset,
-
-        batch_size=BATCH_SIZE,
-
-        shuffle=False,
 
         num_workers=0,
 
@@ -785,30 +767,11 @@ def train():
 
         print(f"Train Accuracy: {train_accuracy:.2f}%")
 
-        # VALIDATION
+        # SAVE BEST MODEL (PODLE TRAIN LOSS)
 
-        (
-            val_loss,
-            val_accuracy,
-            val_correct,
-            val_incorrect,
-            class_correct,
-            class_total
-        ) = validate(
+        if train_loss < best_loss:
 
-            model,
-
-            validation_loader,
-
-            criterion
-
-        )
-
-        # SAVE BEST MODEL
-
-        if val_loss < best_loss:
-
-            best_loss = val_loss
+            best_loss = train_loss
 
             patience_counter = 0
 
@@ -839,7 +802,7 @@ def train():
 
             print("\nEARLY STOPPING!")
 
-            print("Validační Loss se nezlepšuje.")
+            print("Train Loss se nezlepšuje.")
 
             break
 
@@ -847,7 +810,7 @@ def train():
 
     print("TRÉNOVÁNÍ DOKONČENO")
 
-    print(f"Nejlepší Validation Loss: {best_loss:.6f}")
+    print(f"Nejlepší Train Loss: {best_loss:.6f}")
 
     print("========================================")
 
@@ -979,10 +942,10 @@ def evaluate_model():
 
 if __name__ == "__main__":
 
-    # "train" = trénování
+    # "train" = trénování (bez validace po epochách)
     # "validate" = samostatná validace
 
-    MODE = "train"
+    MODE = "train"  # nebo "validate"
 
     if MODE == "train":
 
