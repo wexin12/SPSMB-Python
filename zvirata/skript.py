@@ -30,7 +30,7 @@ downloaded = set()
 rows = []
 page = 1
 
-print("Starting fish dataset download...")
+print("Starting v dataset download...")
 
 with tqdm(total=TARGET_IMAGES) as progress:
 
