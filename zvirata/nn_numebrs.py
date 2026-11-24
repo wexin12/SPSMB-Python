@@ -945,7 +945,7 @@ if __name__ == "__main__":
     # "train" = trénování (bez validace po epochách)
     # "validate" = samostatná validace
 
-    MODE = "train"  # nebo "validate"
+    MODE = "validate"  # nebo "validate"
 
     if MODE == "train":
 
