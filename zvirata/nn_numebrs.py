@@ -75,9 +75,9 @@ if torch.cuda.is_available():
 train_transform = transforms.Compose([
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.RandomAffine(
-        degrees=10,
+        degrees=4,
         translate=(0.05, 0.05),
-        scale=(0.90, 1.10),
+        scale=(0.95, 1.05),
         shear=3,
         fill=1.0,
     ),
@@ -649,7 +649,7 @@ if __name__ == "__main__":
     # "train" = trénování na animals_train
     # "validate" = validace na všech obrázcích v animals
 
-    MODE = "validate"  # Změň na "validate", pokud chceš pouze validovat.
+    MODE = "train"  # Změň na "validate", pokud chceš pouze validovat.
 
     if MODE == "train":
         train()
